@@ -47,8 +47,8 @@ def getSpecificData(files, head, hand):
             df_p = pd.concat([df_body, df_head, df_Lhand, df_Rhand], axis=1)
             df_all = pd.concat([df_all, df_p])
 
-        df_all.to_csv("./result.csv", index=False)
-        print("done")
+    df_all.to_csv("./result.csv", index=False)
+    print("done")
 
 
 def parts(data, parts_name):
