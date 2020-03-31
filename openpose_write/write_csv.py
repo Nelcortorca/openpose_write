@@ -29,22 +29,29 @@ def getCSV(files, face, hand):
     for i in range(len(files)):
         with open(files[i]) as f:
             data = json.load(f)
-            #             data_b= np.array(data['people'][0]['pose_keypoints_2d']).reshape(-1,3)
-            data_b = np.array(data['people'][-1]['pose_keypoints_2d']).reshape(1, -1)
-            df_body = pd.DataFrame(data_b, columns=for_b_columns)
-            if face == "1":
-                data_head = np.array(data['people'][-1]['face_keypoints_2d']).reshape(1, -1)
-                df_face = parts(data_head, "face")
+            persons = data['people']
+            if persons:
+                #             data_b= np.array(data['people'][0]['pose_keypoints_2d']).reshape(-1,3)
+                data_b = np.array(persons['people'][-1]['pose_keypoints_2d']).reshape(1, -1)
+                df_body = pd.DataFrame(data_b, columns=for_b_columns)
+                if face == "1":
+                    data_head = np.array(persons['people'][-1]['face_keypoints_2d']).reshape(1, -1)
+                    df_face = parts(data_head, "face")
 
-            if hand == "1":
-                data_L = np.array(data['people'][-1]['hand_left_keypoints_2d']).reshape(1, -1)
-                df_Lhand = parts(data_L, "Lhand")
-                data_R = np.array(data['people'][-1]['hand_right_keypoints_2d']).reshape(1, -1)
-                df_Rhand = parts(data_R, "Rhand")
+                if hand == "1":
+                    data_L = np.array(persons['people'][-1]['hand_left_keypoints_2d']).reshape(1, -1)
+                    df_Lhand = parts(data_L, "Lhand")
+                    data_R = np.array(persons['people'][-1]['hand_right_keypoints_2d']).reshape(1, -1)
+                    df_Rhand = parts(data_R, "Rhand")
 
-            df_p = pd.concat([df_body, df_face, df_Lhand, df_Rhand], axis=1)
-            df_all = pd.concat([df_all, df_p])
 
+
+                df_p = pd.concat([df_body, df_face, df_Lhand, df_Rhand], axis=1)
+                df_all = pd.concat([df_all, df_p])
+
+            else:
+                non_person=pd.DataFrame("non_person")
+                df_all=pd.concat([df_all,non_person])
     df_all.to_csv("./result.csv", index=False)
     print("done")
 
