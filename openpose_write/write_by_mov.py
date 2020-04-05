@@ -1,3 +1,4 @@
+#動画データを一つのcsvファイルに直す
 import json
 import pandas as pd
 import numpy as np
@@ -29,30 +30,37 @@ def getCSV(files, face, hand):
 
     for i in range(len(files)):
         with open(files[i]) as f:
-            file_name=pd.DataFrame([files[i]],columns=["file_name"])
             data = json.load(f)
+            print(len(data))
             persons = data['people']
+            print(persons)
             if persons:
-                #             data_b= np.array(data['people'][0]['pose_keypoints_2d']).reshape(-1,3)
-                data_b = np.array(data['people'][0]['pose_keypoints_2d']).reshape(1, -1)
-                df_body = pd.DataFrame(data_b, columns=for_b_columns)
-                if face == "1":
-                    data_head = np.array(data['people'][0]['face_keypoints_2d']).reshape(1, -1)
-                    df_face = parts(data_head, "face")
+                for t in range(len(persons)):
+                    print(t)
+                    #             data_b= np.array(data['people'][0]['pose_keypoints_2d']).reshape(-1,3)
+                    data_b = np.array(data['people'][t]['pose_keypoints_2d']).reshape(1, -1)
+                    df_body = pd.DataFrame(data_b, columns=for_b_columns)
+                    if face == "1":
+                        data_head = np.array(data['people'][t]['face_keypoints_2d']).reshape(1, -1)
+                        df_face = parts(data_head, "face")
 
-                if hand == "1":
-                    data_L = np.array(data['people'][0]['hand_left_keypoints_2d']).reshape(1, -1)
-                    df_Lhand = parts(data_L, "Lhand")
-                    data_R = np.array(data['people'][0]['hand_right_keypoints_2d']).reshape(1, -1)
-                    df_Rhand = parts(data_R, "Rhand")
+                    if hand == "1":
+                        data_L = np.array(data['people'][t]['hand_left_keypoints_2d']).reshape(1, -1)
+                        df_Lhand = parts(data_L, "Lhand")
+                        data_R = np.array(data['people'][t]['hand_right_keypoints_2d']).reshape(1, -1)
+                        df_Rhand = parts(data_R, "Rhand")
 
 
 
-                df_p = pd.concat([file_name,df_body, df_face, df_Lhand, df_Rhand], axis=1)
-                df_all = pd.concat([df_all, df_p])
+                    df_p = pd.concat([df_body, df_face, df_Lhand, df_Rhand], axis=1)
+                    df_p.insert(0,"file_name",files[i])
+                    df_p.insert(1,"person_num",t)
+
+                    df_all = pd.concat([df_all, df_p])
 
             else:
                 non_person=pd.DataFrame("non_person")
+                non_person.insert(0,"file_name",files[i])
                 df_all=pd.concat([df_all,non_person])
     df_all.to_csv("./result.csv", index=False)
     print("done")
